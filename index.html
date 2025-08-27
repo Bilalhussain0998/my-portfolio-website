@@ -3,1319 +3,985 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisualForge - Graphic Design Portfolio</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Allthings Do - AI Image Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d0d1a; /* Dark background */
-            color: #e0e0e0;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
-            scroll-behavior: smooth; /* Smooth scrolling for anchor links */
-        }
-        .gradient-text {
-            background: linear-gradient(90deg, #8a2be2, #4a00e0, #e000e0); /* Purple to Blue to Neon Pink */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
         .gradient-bg {
-            background: linear-gradient(135deg, #8a2be2, #4a00e0, #e000e0);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .glow-effect {
-            box-shadow: 0 0 15px rgba(138, 43, 226, 0.6), 0 0 30px rgba(74, 0, 224, 0.4), 0 0 45px rgba(224, 0, 224, 0.2);
+        
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
         }
-        .card-glow {
-            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background-color: #f8fafc;
         }
-        .hero-image-container {
-            position: relative;
-            width: 100%;
-            padding-top: 100%; /* 1:1 Aspect Ratio */
-            overflow: hidden;
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f1f5f9;
+            transform: scale(1.02);
         }
-        .hero-image-container img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 1.5rem; /* rounded-3xl */
-            transition: opacity 1s ease-in-out;
+        
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .hero-image-container .image-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 5px solid rgba(138, 43, 226, 0.5);
-            border-radius: 1.5rem;
-            transform: rotateY(20deg) rotateX(10deg); /* Simple 3D effect */
-            transform-style: preserve-3d;
-            z-index: 10;
-            pointer-events: none; /* Allow clicks to pass through */
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        /* Custom scrollbar for horizontal sections */
-        .horizontal-scroll-container::-webkit-scrollbar {
-            height: 8px;
+        
+        .tool-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: #64748b;
         }
-        .horizontal-scroll-container::-webkit-scrollbar-track {
-            background: #2d2d4a; /* Darker track */
-            border-radius: 10px;
+        
+        .tool-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
         }
-        .horizontal-scroll-container::-webkit-scrollbar-thumb {
-            background: #8a2be2; /* Purple thumb */
-            border-radius: 10px;
+        
+        .tool-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
         }
-        .horizontal-scroll-container::-webkit-scrollbar-thumb:hover {
-            background: #4a00e0; /* Darker purple on hover */
-        }
-
-        /* Keyframes for simple pulse animation */
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
-        }
-        .animate-pulse-custom {
-            animation: pulse 2s infinite ease-in-out;
-        }
-
-        /* Modal specific styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 100; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
-            backdrop-filter: blur(8px); /* Blur effect */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background-color: #1a1a2e;
-            margin: auto;
-            padding: 3rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.7);
-            max-width: 90%;
-            width: 500px;
-            position: relative;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .portfolio-modal-content, .reviews-modal-content, .stories-modal-content, .support-modal-content, .service-showcase-modal-content {
-            background-color: #1a1a2e;
-            margin: auto;
-            padding: 2rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.7);
-            max-width: 95%; /* Wider for content modals */
-            width: 800px; /* Max width for content modals */
-            position: relative;
-            animation: fadeIn 0.3s ease-out;
-            max-height: 90vh; /* Limit height for scrollability */
-            overflow-y: auto; /* Enable scrolling for content */
-        }
-
-        .close-button {
-            color: #aaa;
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: #e000e0;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Loading spinner */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #8a2be2;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Hidden items for "Load More" functionality */
-        .hidden-item {
+        
+        .page {
             display: none;
+        }
+        
+        .page.active {
+            display: block;
         }
     </style>
 </head>
-<body class="antialiased">
-
+<body class="bg-gray-50">
     <!-- Header -->
-    <header class="bg-gray-900 bg-opacity-50 backdrop-blur-md sticky top-0 z-50 py-4 px-6 md:px-12 rounded-b-3xl shadow-lg">
-        <nav class="container mx-auto flex flex-wrap items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span class="text-2xl font-extrabold gradient-text">VisualForge</span>
-            </div>
-            <div class="hidden md:flex items-center space-x-8 text-lg font-medium">
-                <a href="#home" class="hover:text-purple-400 transition duration-300">Home</a>
-                <a href="#portfolio-showcase" class="hover:text-purple-400 transition duration-300">Portfolio</a>
-                <a href="#services" class="hover:text-purple-400 transition duration-300">Services</a>
-                <a href="#clients" class="hover:text-purple-400 transition duration-300">Clients</a>
-                <a href="#blog" class="hover:text-purple-400 transition duration-300">Blog</a>
-            </div>
-            <div class="flex items-center space-x-4">
-                <div class="relative hidden md:block">
-                    <input type="text" placeholder="Search" class="bg-gray-800 text-white rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="showPage('home')">
+                    <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">A</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-900">Allthings Do</h1>
                 </div>
-                <button id="hireMeButton" class="gradient-bg text-white font-bold py-2 px-6 rounded-full hover:scale-105 transition duration-300 glow-effect">Hire Me</button>
-                <button class="md:hidden text-white text-2xl focus:outline-none">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" onclick="showPage('tools')" class="text-gray-600 hover:text-purple-600 font-medium">Tools</a>
+                    <a href="#" onclick="showPage('pricing')" class="text-gray-600 hover:text-purple-600 font-medium">Pricing</a>
+                    <a href="#" onclick="showPage('about')" class="text-gray-600 hover:text-purple-600 font-medium">About</a>
+                </nav>
             </div>
-        </nav>
+        </div>
     </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="container mx-auto px-6 md:px-12 py-16 md:py-24 flex flex-col lg:flex-row items-center justify-between gap-12">
-        <div class="lg:w-1/2 text-center lg:text-left">
-            <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 gradient-text">Discover, Collect and Explore Dope Graphic Designs</h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-8">High-end thumbnails, branding, UI/UX, and creative digital visuals — all in one place.</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <a href="#portfolio-showcase" class="gradient-bg text-white font-bold py-3 px-8 rounded-full hover:scale-105 transition duration-300 glow-effect text-center">View Portfolio</a>
-                <button id="letsWorkButton" class="bg-gray-800 text-white font-bold py-3 px-8 rounded-full border border-purple-500 hover:bg-purple-900 hover:border-purple-700 transition duration-300">Let’s Work</button>
+    <!-- Home Page -->
+    <div id="homePage" class="page active">
+        <!-- Hero Section -->
+        <section class="gradient-bg py-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    AI Image Tools Suite
+                </h2>
+                <p class="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
+                    Professional image editing tools powered by artificial intelligence. Enhance, resize, compress, and transform your images with ease.
+                </p>
+                <button onclick="showPage('tools')" class="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
+                    Explore Tools
+                </button>
             </div>
-        </div>
-        <div class="lg:w-1/2 w-full flex justify-center lg:justify-end">
-            <div class="hero-image-container w-full max-w-md animate-pulse-custom">
-                <img id="hero-slideshow-image" src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Drive_Beyond_The_Horizon_p6icoz.jpg" alt="Drive Beyond The Horizon Thumbnail" class="rounded-3xl shadow-2xl">
-                <div class="image-frame"></div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Stats Bar -->
-    <section id="stats" class="container mx-auto px-6 md:px-12 py-12 md:py-16 bg-gray-900 rounded-3xl shadow-lg mb-16">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-            <div class="flex flex-col items-center">
-                <p class="text-4xl md:text-5xl font-extrabold gradient-text">500+</p>
-                <p class="text-lg text-gray-300 mt-2">Projects</p>
-                <div class="flex -space-x-2 mt-4">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ff00ff/ffffff?text=A" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/00ffff/ffffff?text=B" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ffff00/ffffff?text=C" alt="Avatar">
+        <!-- Tools Grid -->
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Choose Your Tool</h3>
+                    <p class="text-xl text-gray-600">Professional image editing made simple</p>
                 </div>
-            </div>
-            <div class="flex flex-col items-center">
-                <p class="text-4xl md:text-5xl font-extrabold gradient-text">100+</p>
-                <p class="text-lg text-gray-300 mt-2">Brands</p>
-                <div class="flex -space-x-2 mt-4">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ff00ff/ffffff?text=D" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/00ffff/ffffff?text=E" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ffff00/ffffff?text=F" alt="Avatar">
-                </div>
-            </div>
-            <div class="flex flex-col items-center">
-                <p class="text-4xl md:text-5xl font-extrabold gradient-text">8+</p>
-                <p class="text-lg text-gray-300 mt-2">Years Experience</p>
-                <div class="flex -space-x-2 mt-4">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ff00ff/ffffff?text=G" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/00ffff/ffffff?text=H" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ffff00/ffffff?text=I" alt="Avatar">
-                </div>
-            </div>
-            <div class="flex flex-col items-center">
-                <p class="text-4xl md:text-5xl font-extrabold gradient-text">5-Star</p>
-                <p class="text-lg text-gray-300 mt-2">Rated</p>
-                <div class="flex -space-x-2 mt-4">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ff00ff/ffffff?text=J" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/00ffff/ffffff?text=K" alt="Avatar">
-                    <img class="w-8 h-8 rounded-full border-2 border-gray-700" src="https://placehold.co/32x32/ffff00/ffffff?text=L" alt="Avatar">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Clients Section -->
-    <section id="clients" class="container mx-auto px-6 md:px-12 py-12 md:py-16 mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 gradient-text">Trusted By</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center">
-            <img src="https://placehold.co/120x60/1a1a2e/ffffff?text=PayPal" alt="PayPal Logo" class="h-12 opacity-70 hover:opacity-100 transition duration-300">
-            <img src="https://placehold.co/120x60/1a1a2e/ffffff?text=Binance" alt="Binance Logo" class="h-12 opacity-70 hover:opacity-100 transition duration-300">
-            <img src="https://placehold.co/120x60/1a1a2e/ffffff?text=Upwork" alt="Upwork Logo" class="h-12 opacity-70 hover:opacity-100 transition duration-300">
-            <img src="https://placehold.co/120x60/1a1a2e/ffffff?text=Behance" alt="Behance Logo" class="h-12 opacity-70 hover:opacity-100 transition duration-300">
-            <img src="https://placehold.co/120x60/1a1a2e/ffffff?text=Fiverr" alt="Fiverr Logo" class="h-12 opacity-70 hover:opacity-100 transition duration-300">
-            <img src="https://placehold.co/120x60/1a1a2e/ffffff?text=Dribbble" alt="Dribbble Logo" class="h-12 opacity-70 hover:opacity-100 transition duration-300">
-        </div>
-    </section>
-
-    <!-- Portfolio Showcase Section -->
-    <section id="portfolio-showcase" class="container mx-auto px-6 md:px-12 py-12 md:py-16 mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 gradient-text">My Portfolio</h2>
-
-        <!-- Thumbnails Section -->
-        <div class="mb-16" id="thumbnails-section">
-            <h3 class="text-2xl md:text-3xl font-bold mb-8 gradient-text">Thumbnails</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="thumbnails-grid">
-                <!-- Thumbnails will be dynamically loaded here by JavaScript -->
-            </div>
-            <div class="text-center mt-8">
-                <button class="load-more-btn bg-purple-600 text-white font-bold py-2 px-6 rounded-full hover:bg-purple-700 transition duration-300" data-target="thumbnails-section">Load More Thumbnails</button>
-            </div>
-        </div>
-
-        <!-- Logo Design Section -->
-        <div class="mb-16" id="logos-section">
-            <h3 class="text-2xl md:text-3xl font-bold mb-8 gradient-text">Logo Designs</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="logos-grid">
-                <!-- Logos will be dynamically loaded here by JavaScript -->
-            </div>
-            <div class="text-center mt-8">
-                <button class="load-more-btn bg-purple-600 text-white font-bold py-2 px-6 rounded-full hover:bg-purple-700 transition duration-300" data-target="logos-section">Load More Logos</button>
-            </div>
-        </div>
-
-        <!-- Social Reels Section -->
-        <div id="reels-section">
-            <h3 class="text-2xl md:text-3xl font-bold mb-8 gradient-text">Social Reels</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="reels-grid">
-                <!-- Reels will be dynamically loaded here by JavaScript -->
-            </div>
-            <div class="text-center mt-8">
-                <button class="load-more-btn bg-purple-600 text-white font-bold py-2 px-6 rounded-full hover:bg-purple-700 transition duration-300" data-target="reels-section">Load More Reels</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Popular Designs Section (Existing - now part of general content, not primary portfolio) -->
-    <section class="container mx-auto px-6 md:px-12 py-12 md:py-16 mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 gradient-text">Popular Designs (Showcase)</h2>
-        <div class="flex overflow-x-auto horizontal-scroll-container pb-4 -mx-6 md:-mx-12" id="popular-designs-container">
-            <!-- Popular Design Card 1 -->
-            <div class="flex-shrink-0 w-80 md:w-96 mx-3 bg-gray-800 rounded-3xl shadow-lg overflow-hidden card-glow cursor-pointer popular-design-item"
-                data-src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Drive_Beyond_The_Horizon_p6icoz.jpg"
-                data-title="Drive Beyond The Horizon"
-                data-category="YouTube, Gaming"
-                data-likes="1.2K"
-                data-views="5.8K"
-                data-description="A dynamic thumbnail capturing the thrill of racing and exploration in a futuristic setting.">
-                <img src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Drive_Beyond_The_Horizon_p6icoz.jpg" alt="Drive Beyond The Horizon Thumbnail" class="w-full h-48 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <h3 class="text-xl font-semibold mb-2 text-white">Drive Beyond The Horizon</h3>
-                    <p class="text-gray-400 text-sm mb-4">Category: YouTube, Gaming</p>
-                    <div class="flex justify-between items-center text-gray-400 text-sm">
-                        <span><i class="fas fa-heart text-red-500 mr-1"></i> 1.2K Likes</span>
-                        <span><i class="fas fa-eye text-blue-500 mr-1"></i> 5.8K Views</span>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div onclick="showPage('upscale')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">🔍</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Upscale Image</h4>
+                        <p class="text-gray-600 text-sm">Enhance resolution up to 4x</p>
+                    </div>
+                    
+                    <div onclick="showPage('compress')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">📦</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Compress Image</h4>
+                        <p class="text-gray-600 text-sm">Reduce file size efficiently</p>
+                    </div>
+                    
+                    <div onclick="showPage('resize')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">📏</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Resize Image</h4>
+                        <p class="text-gray-600 text-sm">Change dimensions precisely</p>
+                    </div>
+                    
+                    <div onclick="showPage('crop')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">✂️</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Crop Image</h4>
+                        <p class="text-gray-600 text-sm">Perfect aspect ratios</p>
+                    </div>
+                    
+                    <div onclick="showPage('convert')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">🔄</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Convert Format</h4>
+                        <p class="text-gray-600 text-sm">Change file formats easily</p>
+                    </div>
+                    
+                    <div onclick="showPage('background')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">🎨</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Remove Background</h4>
+                        <p class="text-gray-600 text-sm">AI-powered background removal</p>
+                    </div>
+                    
+                    <div onclick="showPage('watermark')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">💧</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Add Watermark</h4>
+                        <p class="text-gray-600 text-sm">Protect your images</p>
+                    </div>
+                    
+                    <div onclick="showPage('rotate')" class="feature-card bg-white p-6 rounded-xl text-center cursor-pointer border-2 border-transparent hover:border-purple-200">
+                        <div class="text-4xl mb-4">🔄</div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Rotate Image</h4>
+                        <p class="text-gray-600 text-sm">Fix orientation issues</p>
                     </div>
                 </div>
             </div>
-            <!-- Popular Design Card 2 -->
-            <div class="flex-shrink-0 w-80 md:w-96 mx-3 bg-gray-800 rounded-3xl shadow-lg overflow-hidden card-glow cursor-pointer popular-design-item"
-                data-src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Mobile_Style_Gaming_Thumbnail_lqgt12.jpg"
-                data-title="Mobile Style Gaming Thumbnail"
-                data-category="YouTube, Gaming"
-                data-likes="980"
-                data-views="4.1K"
-                data-description="A sleek and engaging thumbnail designed specifically for mobile gaming content, optimized for small screens.">
-                <img src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Mobile_Style_Gaming_Thumbnail_lqgt12.jpg" alt="Mobile Style Gaming Thumbnail" class="w-full h-48 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <h3 class="text-xl font-semibold mb-2 text-white">Mobile Style Gaming Thumbnail</h3>
-                    <p class="text-gray-400 text-sm mb-4">Category: YouTube, Gaming</p>
-                    <div class="flex justify-between items-center text-gray-400 text-sm">
-                        <span><i class="fas fa-heart text-red-500 mr-1"></i> 980 Likes</span>
-                        <span><i class="fas fa-eye text-blue-500 mr-1"></i> 4.1K Views</span>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Allthings Do?</h3>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                        Our AI-powered tools deliver professional results with cutting-edge technology
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="feature-card bg-gray-50 p-8 rounded-xl text-center">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Lightning Fast</h4>
+                        <p class="text-gray-600">Process images in seconds with our optimized AI algorithms</p>
+                    </div>
+                    
+                    <div class="feature-card bg-gray-50 p-8 rounded-xl text-center">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Premium Quality</h4>
+                        <p class="text-gray-600">Maintain image quality while increasing resolution up to 4x</p>
+                    </div>
+                    
+                    <div class="feature-card bg-gray-50 p-8 rounded-xl text-center">
+                        <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">100% Secure</h4>
+                        <p class="text-gray-600">Your images are processed securely and deleted after 24 hours</p>
                     </div>
                 </div>
             </div>
-            <!-- Popular Design Card 3 -->
-            <div class="flex-shrink-0 w-80 md:w-96 mx-3 bg-gray-800 rounded-3xl shadow-lg overflow-hidden card-glow cursor-pointer popular-design-item"
-                data-src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320298/Tung_Tung_Tung_Sahur_r4iuss.jpg"
-                data-title="Tung Tung Tung Sahur"
-                data-category="YouTube, Entertainment"
-                data-likes="750"
-                data-views="3.5K"
-                data-description="A fun and catchy thumbnail for entertainment content, featuring vibrant colors and playful elements.">
-                <img src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320298/Tung_Tung_Tung_Sahur_r4iuss.jpg" alt="Tung Tung Tung Sahur Thumbnail" class="w-full h-48 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <h3 class="text-xl font-semibold mb-2 text-white">Tung Tung Tung Sahur</h3>
-                    <p class="text-gray-400 text-sm mb-4">Category: YouTube, Entertainment</p>
-                    <div class="flex justify-between items-center text-gray-400 text-sm">
-                        <span><i class="fas fa-heart text-red-500 mr-1"></i> 750 Likes</span>
-                        <span><i class="fas fa-eye text-blue-500 mr-1"></i> 3.5K Views</span>
+        </section>
+    </div>
+
+    <!-- Tools Page -->
+    <div id="toolsPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold text-white mb-6">All Tools</h2>
+                <p class="text-xl text-purple-100">Choose from our comprehensive suite of image editing tools</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div onclick="showPage('upscale')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">🔍</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Upscale Image</h4>
+                        <p class="text-gray-600">Enhance resolution up to 4x using AI</p>
+                    </div>
+                    
+                    <div onclick="showPage('compress')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">📦</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Compress Image</h4>
+                        <p class="text-gray-600">Reduce file size while maintaining quality</p>
+                    </div>
+                    
+                    <div onclick="showPage('resize')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">📏</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Resize Image</h4>
+                        <p class="text-gray-600">Change dimensions to exact specifications</p>
+                    </div>
+                    
+                    <div onclick="showPage('crop')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">✂️</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Crop Image</h4>
+                        <p class="text-gray-600">Perfect aspect ratios for any platform</p>
+                    </div>
+                    
+                    <div onclick="showPage('convert')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">🔄</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Convert Format</h4>
+                        <p class="text-gray-600">Change between JPG, PNG, WebP, PDF</p>
+                    </div>
+                    
+                    <div onclick="showPage('background')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">🎨</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Remove Background</h4>
+                        <p class="text-gray-600">AI-powered background removal</p>
+                    </div>
+                    
+                    <div onclick="showPage('watermark')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">💧</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Add Watermark</h4>
+                        <p class="text-gray-600">Protect your images with custom watermarks</p>
+                    </div>
+                    
+                    <div onclick="showPage('rotate')" class="feature-card bg-white p-8 rounded-xl text-center cursor-pointer">
+                        <div class="text-5xl mb-4">🔄</div>
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2">Rotate Image</h4>
+                        <p class="text-gray-600">Fix orientation and rotation issues</p>
                     </div>
                 </div>
             </div>
-            <!-- Popular Design Card 4 -->
-            <div class="flex-shrink-0 w-80 md:w-96 mx-3 bg-gray-800 rounded-3xl shadow-lg overflow-hidden card-glow cursor-pointer popular-design-item"
-                data-src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320299/Discipline_Mind_n37wd7.jpg"
-                data-title="Discipline Mind"
-                data-category="YouTube, Educational"
-                data-likes="1.5K"
-                data-views="6.2K"
-                data-description="A powerful thumbnail for motivational and educational content, emphasizing focus and mental strength.">
-                <img src="https://res.cloudinary.com/dm4q9blay/image/upload/v1752320299/Discipline_Mind_n37wd7.jpg" alt="Discipline Mind Thumbnail" class="w-full h-48 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <h3 class="text-xl font-semibold mb-2 text-white">Discipline Mind</h3>
-                    <p class="text-gray-400 text-sm mb-4">Category: YouTube, Educational</p>
-                    <div class="flex justify-between items-center text-gray-400 text-sm">
-                        <span><i class="fas fa-heart text-red-500 mr-1"></i> 1.5K Likes</span>
-                        <span><i class="fas fa-eye text-blue-500 mr-1"></i> 6.2K Views</span>
+        </section>
+    </div>
+
+    <!-- Pricing Page -->
+    <div id="pricingPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold text-white mb-6">Simple Pricing</h2>
+                <p class="text-xl text-purple-100">Choose the plan that works best for you</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Free</h3>
+                        <div class="text-4xl font-bold text-gray-900 mb-6">$0<span class="text-lg text-gray-600">/month</span></div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> 10 images per month</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Basic tools access</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Standard quality</li>
+                        </ul>
+                        <button class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90">Get Started</button>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-purple-500 relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Popular</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Pro</h3>
+                        <div class="text-4xl font-bold text-gray-900 mb-6">$9<span class="text-lg text-gray-600">/month</span></div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> 500 images per month</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> All tools access</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> High quality processing</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Priority support</li>
+                        </ul>
+                        <button class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90">Choose Pro</button>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Enterprise</h3>
+                        <div class="text-4xl font-bold text-gray-900 mb-6">$29<span class="text-lg text-gray-600">/month</span></div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Unlimited images</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> All tools + API access</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Maximum quality</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> 24/7 support</li>
+                        </ul>
+                        <button class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90">Contact Sales</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- Top Clients Section (Existing) -->
-    <section class="container mx-auto px-6 md:px-12 py-12 md:py-16 mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 gradient-text">Top Clients</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Client Card 1 -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow">
-                <img src="https://placehold.co/100x100/4a00e0/ffffff?text=Client+1" alt="Client Photo" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-purple-600">
-                <h3 class="text-xl font-semibold text-white">Sarah Johnson</h3>
-                <p class="text-gray-400 mb-2">CEO, Tech Solutions</p>
-                <p class="text-lg font-bold gradient-text">Total Spend: $15,000</p>
-                <p class="text-gray-300">Projects Completed: 12</p>
+    <!-- About Page -->
+    <div id="aboutPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold text-white mb-6">About Allthings Do</h2>
+                <p class="text-xl text-purple-100">Empowering creators with AI-powered image tools</p>
             </div>
-            <!-- Client Card 2 -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow">
-                <img src="https://placehold.co/100x100/e000e0/ffffff?text=Client+2" alt="Client Photo" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-purple-600">
-                <h3 class="text-xl font-semibold text-white">Michael Chen</h3>
-                <p class="text-gray-400 mb-2">Marketing Director, Global Brands</p>
-                <p class="text-lg font-bold gradient-text">Total Spend: $10,500</p>
-                <p class="text-gray-300">Projects Completed: 8</p>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-lg p-12">
+                    <h3 class="text-3xl font-bold text-gray-900 mb-6">Our Mission</h3>
+                    <p class="text-lg text-gray-600 mb-8">
+                        At Allthings Do, we believe that powerful image editing tools should be accessible to everyone. 
+                        Our AI-powered platform democratizes professional image editing, making it simple for creators, 
+                        businesses, and individuals to enhance their visual content.
+                    </p>
+                    
+                    <h3 class="text-3xl font-bold text-gray-900 mb-6">Why Choose Us?</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-900 mb-3">🚀 Cutting-Edge AI</h4>
+                            <p class="text-gray-600">Our algorithms are trained on millions of images to deliver the best results.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-900 mb-3">🔒 Privacy First</h4>
+                            <p class="text-gray-600">Your images are processed securely and automatically deleted after 24 hours.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-900 mb-3">⚡ Lightning Fast</h4>
+                            <p class="text-gray-600">Process images in seconds with our optimized cloud infrastructure.</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold text-gray-900 mb-3">💡 Easy to Use</h4>
+                            <p class="text-gray-600">No technical knowledge required. Just upload, process, and download.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Client Card 3 -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow">
-                <img src="https://placehold.co/100x100/8a2be2/ffffff?text=Client+3" alt="Client Photo" class="w-24 h-24 rounded-full object-cover mb-4 border-4 border-purple-600">
-                <h3 class="text-xl font-semibold text-white">Emily White</h3>
-                <p class="text-gray-400 mb-2">Founder, Creative Agency</p>
-                <p class="text-lg font-bold gradient-text">Total Spend: $8,200</p>
-                <p class="text-gray-300">Projects Completed: 6</p>
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- Explore Services Section -->
-    <section id="services" class="container mx-auto px-6 md:px-12 py-12 md:py-16 mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-center mb-10 gradient-text">Explore Services</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <!-- Service Card 1: Thumbnails -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow cursor-pointer service-item" data-service-type="thumbnails">
-                <img src="https://placehold.co/200x150/0d0d1a/ffffff?text=YouTube+Thumbnails" alt="Thumbnails Service" class="w-full h-32 object-cover rounded-xl mb-4">
-                <h3 class="text-xl font-semibold text-white">Thumbnails</h3>
-                <p class="text-gray-400 mb-2">High-impact YouTube thumbnails.</p>
-                <p class="text-lg font-bold gradient-text">250+ Items</p>
+    <!-- Individual Tool Pages -->
+    <div id="upscalePage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">🔍</div>
+                <h2 class="text-4xl font-bold text-white mb-6">AI Image Upscaler</h2>
+                <p class="text-xl text-purple-100">Enhance your images with artificial intelligence. Upscale and improve image quality up to 4x without losing detail.</p>
             </div>
-            <!-- Service Card 2: Logo Design -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow cursor-pointer service-item" data-service-type="logos">
-                <img src="https://placehold.co/200x150/0d0d1a/ffffff?text=Brand+Logos" alt="Logo Design Service" class="w-full h-32 object-cover rounded-xl mb-4">
-                <h3 class="text-xl font-semibold text-white">Logo Design</h3>
-                <p class="text-gray-400 mb-2">Unique and memorable brand logos.</p>
-                <p class="text-lg font-bold gradient-text">80+ Items</p>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div id="upscaleUploadArea" class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image to upscale</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Upscale Settings</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Scale Factor</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="2">2x (Recommended)</option>
+                                    <option value="4">4x (Maximum)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Enhancement Type</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="general">General (Default)</option>
+                                    <option value="photo">Photo Enhancement</option>
+                                    <option value="art">Digital Art</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="processImage('upscale')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Start Upscaling
+                        </button>
+                    </div>
+                </div>
             </div>
-            <!-- Service Card 3: UI/UX -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow cursor-pointer service-item" data-service-type="uiux">
-                <img src="https://placehold.co/200x150/0d0d1a/ffffff?text=Web+App+UI/UX" alt="UI/UX Service" class="w-full h-32 object-cover rounded-xl mb-4">
-                <h3 class="text-xl font-semibold text-white">UI/UX Design</h3>
-                <p class="text-gray-400 mb-2">Intuitive user interfaces and experiences.</p>
-                <p class="text-lg font-bold gradient-text">40+ Items</p>
-            </div>
-            <!-- Service Card 4: Banners -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow cursor-pointer service-item" data-service-type="banners">
-                <img src="https://placehold.co/200x150/0d0d1a/ffffff?text=Digital+Banners" alt="Banners Service" class="w-full h-32 object-cover rounded-xl mb-4">
-                <h3 class="text-xl font-semibold text-white">Banners</h3>
-                <p class="text-gray-400 mb-2">Eye-catching web and social banners.</p>
-                <p class="text-lg font-bold gradient-text">150+ Items</p>
-            </div>
-            <!-- Service Card 5: Reels Editing -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow cursor-pointer service-item" data-service-type="reels">
-                <img src="https://placehold.co/200x150/0d0d1a/ffffff?text=Video+Reels" alt="Reels Editing Service" class="w-full h-32 object-cover rounded-xl mb-4">
-                <h3 class="text-xl font-semibold text-white">Reels Editing</h3>
-                <p class="text-gray-400 mb-2">Engaging short video content for social media.</p>
-                <p class="text-lg font-bold gradient-text">60+ Items</p>
-            </div>
-            <!-- Service Card 6: Social Media Kits -->
-            <div class="bg-gray-900 rounded-3xl shadow-lg p-6 flex flex-col items-center text-center card-glow cursor-pointer service-item" data-service-type="socialMediaKits">
-                <img src="https://placehold.co/200x150/0d0d1a/ffffff?text=Social+Media+Graphics" alt="Social Media Kits Service" class="w-full h-32 object-cover rounded-xl mb-4">
-                <h3 class="text-xl font-semibold text-white">Social Media Kits</h3>
-                <p class="text-gray-400 mb-2">Complete visual packages for social presence.</p>
-                <p class="text-lg font-bold gradient-text">30+ Items</p>
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- CTA Section -->
-    <section class="container mx-auto px-6 md:px-12 py-16 md:py-24 mb-16 gradient-bg rounded-3xl shadow-2xl text-center glow-effect">
-        <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-8 leading-tight">Join Hands To Elevate Your Brand Visuals</h2>
-        <button id="letsCollaborateButton" class="bg-white text-purple-800 font-bold py-4 px-10 rounded-full text-xl hover:scale-105 transition duration-300 shadow-lg">Let’s Collaborate</button>
-    </section>
+    <!-- Compress Page -->
+    <div id="compressPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">📦</div>
+                <h2 class="text-4xl font-bold text-white mb-6">Image Compressor</h2>
+                <p class="text-xl text-purple-100">Reduce file size while maintaining quality. Perfect for web optimization and faster loading times.</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image to compress</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Compression Settings</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Quality Level</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="high">High Quality (80%)</option>
+                                    <option value="medium">Medium Quality (60%)</option>
+                                    <option value="low">Low Quality (40%)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Target Size</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="auto">Auto Optimize</option>
+                                    <option value="1mb">Under 1MB</option>
+                                    <option value="500kb">Under 500KB</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="processImage('compress')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Start Compression
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Resize Page -->
+    <div id="resizePage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">📏</div>
+                <h2 class="text-4xl font-bold text-white mb-6">Image Resizer</h2>
+                <p class="text-xl text-purple-100">Change image dimensions to exact pixel values. Maintain aspect ratio or set custom dimensions.</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image to resize</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Resize Settings</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Width (px)</label>
+                                <input type="number" placeholder="1920" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Height (px)</label>
+                                <input type="number" placeholder="1080" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" checked class="rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                <span class="ml-2 text-sm text-gray-700">Maintain aspect ratio</span>
+                            </label>
+                        </div>
+                        <button onclick="processImage('resize')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Resize Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Crop Page -->
+    <div id="cropPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">✂️</div>
+                <h2 class="text-4xl font-bold text-white mb-6">Image Cropper</h2>
+                <p class="text-xl text-purple-100">Crop images to specific aspect ratios or custom dimensions. Perfect for social media and web use.</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image to crop</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Crop Settings</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Aspect Ratio</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="free">Free Form</option>
+                                    <option value="1:1">Square (1:1)</option>
+                                    <option value="16:9">Widescreen (16:9)</option>
+                                    <option value="4:3">Standard (4:3)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="center">Center</option>
+                                    <option value="top">Top</option>
+                                    <option value="bottom">Bottom</option>
+                                    <option value="left">Left</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="processImage('crop')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Crop Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Convert Page -->
+    <div id="convertPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">🔄</div>
+                <h2 class="text-4xl font-bold text-white mb-6">Format Converter</h2>
+                <p class="text-xl text-purple-100">Convert between different image formats (JPG, PNG, WebP, PDF) with quality control.</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image to convert</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Format Conversion</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Convert To</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="jpg">JPG</option>
+                                    <option value="png">PNG</option>
+                                    <option value="webp">WebP</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Quality</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="100">Maximum (100%)</option>
+                                    <option value="90">High (90%)</option>
+                                    <option value="80">Good (80%)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="processImage('convert')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Convert Format
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Background Page -->
+    <div id="backgroundPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">🎨</div>
+                <h2 class="text-4xl font-bold text-white mb-6">Background Remover</h2>
+                <p class="text-xl text-purple-100">Automatically remove backgrounds from images using AI. Perfect for product photos and portraits.</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image to process</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Background Removal</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Detection Mode</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="auto">Auto Detect</option>
+                                    <option value="person">Person</option>
+                                    <option value="object">Object</option>
+                                    <option value="product">Product</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Edge Smoothing</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="processImage('background')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Remove Background
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Watermark Page -->
+    <div id="watermarkPage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">💧</div>
+                <h2 class="text-4xl font-bold text-white mb-6">Watermark Tool</h2>
+                <p class="text-xl text-purple-100">Add text or image watermarks to protect your images. Customize position, opacity, and style.</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image for watermark</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Watermark Settings</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Watermark Text</label>
+                                <input type="text" placeholder="© Your Name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="bottom-right">Bottom Right</option>
+                                    <option value="bottom-left">Bottom Left</option>
+                                    <option value="top-right">Top Right</option>
+                                    <option value="top-left">Top Left</option>
+                                    <option value="center">Center</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Opacity</label>
+                            <input type="range" min="10" max="100" value="50" class="w-full">
+                        </div>
+                        <button onclick="processImage('watermark')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Add Watermark
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Rotate Page -->
+    <div id="rotatePage" class="page">
+        <section class="gradient-bg py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="text-6xl mb-4">🔄</div>
+                <h2 class="text-4xl font-bold text-white mb-6">Image Rotator</h2>
+                <p class="text-xl text-purple-100">Rotate images by specific angles or flip horizontally/vertically. Fix orientation issues easily.</p>
+            </div>
+        </section>
+        
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <div class="upload-area rounded-xl p-12 text-center cursor-pointer">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Select image to rotate</h3>
+                        <p class="text-gray-600 mb-4">or drop it here</p>
+                        <button class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Choose Image
+                        </button>
+                        <p class="text-sm text-gray-500 mt-4">Supports JPG, PNG, WEBP up to 10MB</p>
+                    </div>
+                    
+                    <div class="mt-8 p-6 bg-gray-50 rounded-xl">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Rotation Settings</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rotation Angle</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="90">90° Clockwise</option>
+                                    <option value="-90">90° Counter-clockwise</option>
+                                    <option value="180">180°</option>
+                                    <option value="custom">Custom Angle</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Background Fill</label>
+                                <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="white">White</option>
+                                    <option value="black">Black</option>
+                                    <option value="transparent">Transparent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="processImage('rotate')" class="mt-6 gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                            Rotate Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 bg-opacity-50 backdrop-blur-md py-12 px-6 md:px-12 rounded-t-3xl shadow-lg">
-        <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 text-center md:text-left">
-            <!-- Logo and Description -->
-            <div class="lg:col-span-2">
-                <h3 class="text-2xl font-extrabold gradient-text mb-4">VisualForge</h3>
-                <p class="text-gray-400 text-sm leading-relaxed">
-                    The world's largest digital marketplace for graphic design to discover, collect, and explore high-end visuals.
-                </p>
-                <div class="flex justify-center md:justify-start space-x-6 mt-6 text-gray-400 text-2xl">
-                    <a href="#" class="hover:text-purple-400 transition duration-300"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="hover:text-purple-400 transition duration-300"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="hover:text-purple-400 transition duration-300"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="hover:text-purple-400 transition duration-300"><i class="fab fa-linkedin-in"></i></a>
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">A</span>
+                        </div>
+                        <h5 class="text-xl font-bold">Allthings Do</h5>
+                    </div>
+                    <p class="text-gray-400">AI-powered tools for all your creative needs.</p>
+                </div>
+                
+                <div>
+                    <h6 class="font-semibold mb-4">Tools</h6>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="showPage('upscale')" class="hover:text-white transition-colors">Image Upscaler</a></li>
+                        <li><a href="#" onclick="showPage('background')" class="hover:text-white transition-colors">Background Remover</a></li>
+                        <li><a href="#" onclick="showPage('compress')" class="hover:text-white transition-colors">Image Compressor</a></li>
+                        <li><a href="#" onclick="showPage('resize')" class="hover:text-white transition-colors">Image Resizer</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h6 class="font-semibold mb-4">Company</h6>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="showPage('about')" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" onclick="alert('Privacy Policy page would be here')" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" onclick="alert('Terms of Service page would be here')" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h6 class="font-semibold mb-4">Support</h6>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" onclick="alert('Help Center page would be here')" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" onclick="alert('Contact form would be here')" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" onclick="alert('API Documentation would be here')" class="hover:text-white transition-colors">API Documentation</a></li>
+                    </ul>
                 </div>
             </div>
-
-            <!-- Services -->
-            <div>
-                <h4 class="text-xl font-semibold text-white mb-4">Services</h4>
-                <ul class="space-y-2 text-gray-400">
-                    <li><a href="#services" class="hover:text-purple-400 transition duration-300">Thumbnails</a></li>
-                    <li><a href="#services" class="hover:text-purple-400 transition duration-300">Logo Design</a></li>
-                    <li><a href="#services" class="hover:text-purple-400 transition duration-300">UI/UX Design</a></li>
-                    <li><a href="#services" class="hover:text-purple-400 transition duration-300">Banners</a></li>
-                    <li><a href="#services" class="hover:text-purple-400 transition duration-300">Reels Editing</a></li>
-                </ul>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Allthings Do. All rights reserved.</p>
             </div>
-
-            <!-- Portfolio -->
-            <div>
-                <h4 class="text-xl font-semibold text-white mb-4">Portfolio</h4>
-                <ul class="space-y-2 text-gray-400">
-                    <li><a href="#portfolio-showcase" class="hover:text-purple-400 transition duration-300">Recent Projects</a></li>
-                    <li><a href="#portfolio-showcase" class="hover:text-purple-400 transition duration-300">Case Studies</a></li>
-                    <li><a href="#portfolio-showcase" class="hover:text-purple-400 transition duration-300">Client Work</a></li>
-                    <li><a href="#portfolio-showcase" class="hover:text-purple-400 transition duration-300">Personal Projects</a></li>
-                </ul>
-            </div>
-
-            <!-- Contact & Testimonials -->
-            <div id="blog">
-                <h4 class="text-xl font-semibold text-white mb-4">Contact</h4>
-                <ul class="space-y-2 text-gray-400">
-                    <li><a href="#" class="hover:text-purple-400 transition duration-300" data-modal-target="hireMeModal">Get in Touch</a></li>
-                    <li><a href="#" class="hover:text-purple-400 transition duration-300" data-modal-target="supportModal">Support</a></li>
-                </ul>
-                <h4 class="text-xl font-semibold text-white mb-4 mt-6">Testimonials</h4>
-                <ul class="space-y-2 text-gray-400">
-                    <li><a href="#" class="hover:text-purple-400 transition duration-300" data-modal-target="clientReviewsModal">Client Reviews</a></li>
-                    <li><a href="#" class="hover:text-purple-400 transition duration-300" data-modal-target="successStoriesModal">Success Stories</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="border-t border-gray-700 mt-10 pt-8 text-center text-gray-500 text-sm">
-            &copy; 2023 VisualForge. All rights reserved.
         </div>
     </footer>
 
-    <!-- Hire Me Modal -->
-    <div id="hireMeModal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal('hireMeModal')">&times;</span>
-            <h2 class="text-3xl font-bold gradient-text mb-6 text-center">Hire Me</h2>
-            <form id="hireMeForm" action="https://formspree.io/f/xkgbdpgy" method="POST" class="space-y-4">
-                <div>
-                    <label for="name" class="block text-gray-300 text-sm font-bold mb-2">Your Name</label>
-                    <input type="text" id="name" name="name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-200 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600" placeholder="John Doe" required>
-                </div>
-                <div>
-                    <label for="email" class="block text-gray-300 text-sm font-bold mb-2">Your Email</label>
-                    <input type="email" id="email" name="email" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-200 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600" placeholder="john.doe@example.com" required>
-                </div>
-                <div>
-                    <label for="message" class="block text-gray-300 text-sm font-bold mb-2">Your Message</label>
-                    <textarea id="message" name="message" rows="5" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-200 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600" placeholder="Tell me about your project..." required></textarea>
-                </div>
-                <div class="flex justify-between items-center mt-4">
-                    <button type="button" id="enhanceMessageButton" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300 flex items-center">
-                        <span id="enhanceMessageText">✨ Enhance Message</span>
-                        <div id="enhanceMessageSpinner" class="spinner ml-2 hidden"></div>
-                    </button>
-                    <button type="submit" class="gradient-bg text-white font-bold py-3 px-8 rounded-full hover:scale-105 transition duration-300 glow-effect">Send Message</button>
-                </div>
-                <p id="formMessage" class="text-center text-green-400 mt-4 hidden"></p>
-            </form>
-        </div>
-    </div>
-
-    <!-- Support Modal -->
-    <div id="supportModal" class="modal hidden">
-        <div class="support-modal-content modal-content">
-            <span class="close-button" onclick="closeModal('supportModal')">&times;</span>
-            <h2 class="text-3xl font-bold gradient-text mb-6 text-center">Support Request</h2>
-            <form id="supportForm" action="https://formspree.io/f/xkgbdpgy" method="POST" class="space-y-4">
-                <div>
-                    <label for="supportName" class="block text-gray-300 text-sm font-bold mb-2">Your Name</label>
-                    <input type="text" id="supportName" name="name" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-200 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600" placeholder="Your Name" required>
-                </div>
-                <div>
-                    <label for="supportEmail" class="block text-gray-300 text-sm font-bold mb-2">Your Email</label>
-                    <input type="email" id="supportEmail" name="email" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-200 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600" placeholder="your.email@example.com" required>
-                </div>
-                <div>
-                    <label for="supportSubject" class="block text-gray-300 text-sm font-bold mb-2">Subject</label>
-                    <input type="text" id="supportSubject" name="subject" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-200 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600" placeholder="e.g., Technical issue, General inquiry" required>
-                </div>
-                <div>
-                    <label for="supportMessage" class="block text-gray-300 text-sm font-bold mb-2">Your Message</label>
-                    <textarea id="supportMessage" name="message" rows="5" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-200 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600" placeholder="Please describe your issue or question here..." required></textarea>
-                </div>
-                <div class="flex justify-center">
-                    <button type="submit" class="gradient-bg text-white font-bold py-3 px-8 rounded-full hover:scale-105 transition duration-300 glow-effect">Send Support Request</button>
-                </div>
-                <p id="supportFormMessage" class="text-center text-green-400 mt-4 hidden"></p>
-            </form>
-        </div>
-    </div>
-
-    <!-- Client Reviews Modal -->
-    <div id="clientReviewsModal" class="modal hidden">
-        <div class="reviews-modal-content modal-content">
-            <span class="close-button" onclick="closeModal('clientReviewsModal')">&times;</span>
-            <h2 class="text-3xl font-bold gradient-text mb-8 text-center">Client Reviews</h2>
-            <div class="space-y-8">
-                <!-- Review 1 -->
-                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                    <p class="text-gray-300 italic mb-4">"VisualForge delivered exceptional branding for my startup. Their attention to detail and creative vision truly brought my ideas to life. Highly recommended!"</p>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-semibold text-white">Sarah Johnson</p>
-                            <p class="text-sm text-gray-400">CEO, Tech Solutions</p>
-                        </div>
-                        <div class="text-yellow-400">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-                <!-- Review 2 -->
-                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                    <p class="text-gray-300 italic mb-4">"The social media kits designed by VisualForge transformed our online presence. They are professional, cohesive, and incredibly effective. A pleasure to work with!"</p>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-semibold text-white">Michael Chen</p>
-                            <p class="text-sm text-gray-400">Marketing Director, Global Brands</p>
-                        </div>
-                        <div class="text-yellow-400">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                        </div>
-                    </div>
-                </div>
-                <!-- Review 3 -->
-                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                    <p class="text-gray-300 italic mb-4">"From UI/UX to banners, VisualForge consistently exceeds expectations. Their designs are not just aesthetically pleasing but also highly functional. Truly a 5-star experience."</p>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-semibold text-white">Emily White</p>
-                            <p class="text-sm text-gray-400">Founder, Creative Agency</p>
-                        </div>
-                        <div class="text-yellow-400">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Stories Modal -->
-    <div id="successStoriesModal" class="modal hidden">
-        <div class="stories-modal-content modal-content">
-            <span class="close-button" onclick="closeModal('successStoriesModal')">&times;</span>
-            <h2 class="text-3xl font-bold gradient-text mb-8 text-center">Success Stories</h2>
-            <div class="space-y-8">
-                <!-- Story 1 -->
-                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-semibold text-white mb-2">Project: Gaming Channel Rebrand</h3>
-                    <p class="text-gray-400 text-sm mb-3">Client: Apex Gaming | Outcome: 30% increase in subscribers</p>
-                    <p class="text-gray-300">VisualForge redesigned Apex Gaming's entire visual identity, including new logos, channel art, and custom thumbnails. The fresh, dynamic look resonated with their audience, leading to a significant boost in subscriber growth and viewer engagement within three months.</p>
-                </div>
-                <!-- Story 2 -->
-                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-semibold text-white mb-2">Project: E-commerce UI/UX Overhaul</h3>
-                    <p class="text-gray-400 text-sm mb-3">Client: StyleHub Online | Outcome: 25% increase in conversion rate</p>
-                    <p class="text-gray-300">StyleHub Online partnered with VisualForge for a complete revamp of their e-commerce website's user interface and experience. By focusing on intuitive navigation and a clean design, the project resulted in a measurable increase in sales conversions and customer satisfaction.</p>
-                </div>
-                <!-- Story 3 -->
-                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-semibold text-white mb-2">Project: Corporate Event Branding</h3>
-                    <p class="text-gray-400 text-sm mb-3">Client: Innovate Summit | Outcome: Record attendance and positive feedback</p>
-                    <p class="text-gray-300">For their annual tech conference, Innovate Summit enlisted VisualForge to create all event branding materials, from digital banners to print collateral. The cohesive and modern design helped attract a record number of attendees and received widespread praise for its professional aesthetic.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Portfolio Detail Modal (for individual portfolio items and popular designs) -->
-    <div id="portfolioDetailModal" class="modal hidden">
-        <div class="portfolio-modal-content">
-            <span class="close-button" onclick="closeModal('portfolioDetailModal')">&times;</span>
-            <div class="flex flex-col md:flex-row gap-6 mb-8">
-                <div class="md:w-1/2 flex justify-center items-center">
-                    <img id="modalPortfolioImage" src="" alt="Portfolio Item" class="rounded-xl max-h-[400px] object-contain w-full">
-                </div>
-                <div class="md:w-1/2">
-                    <h3 id="modalPortfolioTitle" class="text-3xl font-bold gradient-text mb-2"></h3>
-                    <p id="modalPortfolioCategory" class="text-gray-400 text-lg mb-4"></p>
-                    <p id="modalPortfolioDescription" class="text-gray-300 mb-4">
-                        This is a detailed description of the portfolio item. It showcases the design process, client brief, challenges faced, and the final impact of the design.
-                    </p>
-                    <div id="modalPortfolioStats" class="flex justify-start items-center text-gray-400 text-base space-x-4">
-                        <span id="modalPortfolioLikes"><i class="fas fa-heart text-red-500 mr-1"></i> 0 Likes</span>
-                        <span id="modalPortfolioViews"><i class="fas fa-eye text-blue-500 mr-1"></i> 0 Views</span>
-                    </div>
-                </div>
-            </div>
-            <div id="relatedItemsSection" class="mt-8">
-                <h4 class="text-2xl font-bold gradient-text mb-6">More from this Niche</h4>
-                <div id="relatedPortfolioItems" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Related items will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Service Showcase Modal (for Explore Services items) -->
-    <div id="serviceShowcaseModal" class="modal hidden">
-        <div class="service-showcase-modal-content modal-content">
-            <span class="close-button" onclick="closeModal('serviceShowcaseModal')">&times;</span>
-            <h2 id="serviceShowcaseTitle" class="text-3xl font-bold gradient-text mb-8 text-center"></h2>
-            <div id="serviceShowcaseGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <!-- Service-specific designs will be loaded here -->
-            </div>
-            <div class="text-center mt-8">
-                <button id="serviceShowcaseLoadMoreBtn" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-full hover:bg-purple-700 transition duration-300 hidden">Load More Designs</button>
-            </div>
-        </div>
-    </div>
-
-
     <script>
-        // Portfolio Data (All items for dynamic loading and filtering)
-        const portfolioItems = {
-            thumbnails: [
-                // Gaming Thumbnails
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Entering_On_A_squid_Game_ya8z3a.jpg", title: "Entering On A Squid Game", category: "YouTube, Gaming", likes: "1.5K", views: "7.2K", description: "A high-impact gaming thumbnail designed to attract viewers, featuring bold characters and dynamic action." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320303/Drive_Beyond_The_Horizon_p6icoz.jpg", title: "Drive Beyond The Horizon", category: "YouTube, Gaming", likes: "1.2K", views: "5.8K", description: "A dynamic thumbnail capturing the thrill of racing and exploration in a futuristic setting." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Mobile_Style_Gaming_Thumbnail_lqgt12.jpg", title: "Mobile Style Gaming Thumbnail", category: "YouTube, Gaming", likes: "980", views: "4.1K", description: "A sleek and engaging thumbnail designed specifically for mobile gaming content, optimized for small screens." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320298/Tung_Tung_Tung_Sahur_r4iuss.jpg", title: "Tung Tung Tung Sahur", category: "YouTube, Entertainment", likes: "750", views: "3.5K", description: "A fun and catchy thumbnail for entertainment content, featuring vibrant colors and playful elements." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320299/Discipline_Mind_n37wd7.jpg", title: "Discipline Mind", category: "YouTube, Educational", likes: "1.5K", views: "6.2K", description: "A powerful thumbnail for motivational and educational content, emphasizing focus and mental strength." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320298/250_Confirm_Airdrop_towco9.jpg", title: "250 Confirm Airdrop", category: "YouTube, Finance", likes: "1.0K", views: "5.0K", description: "An engaging thumbnail for cryptocurrency-related content, designed to attract viewers interested in digital assets and airdrops." },
-                // Previous images with updated names/categories
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752305625/My_squad_hxjaxt.jpg", title: "Your Mindset", category: "YouTube, Educational", likes: "1.5K", views: "7.2K", description: "A high-impact gaming thumbnail designed to attract viewers, featuring bold characters and dynamic action." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752305624/Roblox_Fine_qxfrxz.jpg", title: "Surviving 100 Days on a Bunker", category: "YouTube, Gaming", likes: "900", views: "4.5K", description: "Vibrant and inviting thumbnail for Roblox survival vlogs, capturing the essence of adventure and excitement." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752305624/MInecraft_Fine_p8zup5.jpg", title: "Minecraft Bed Wars Thumbnail", category: "YouTube, Gaming", likes: "850", views: "3.9K", description: "Engaging thumbnail for Minecraft gameplay, using strong visuals and minimalist design to represent audio content effectively." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752305625/Mot_df9yxd.jpg", title: "School boy runway", category: "YouTube, Gaming", likes: "750", views: "3.5K", description: "Clear and informative thumbnail for educational tutorials, designed to convey expertise and encourage learning." },
-                { src: "https://res.cloudinary.com/dm4q9blay/image/upload/v1752305625/cloud_gaming.jpg", title: "Cloud Gaming Thumbnail", category: "YouTube, Gaming", likes: "1.8K", views: "9.0K", description: "Sleek and modern thumbnail for cloud gaming reviews, highlighting product features and a professional aesthetic." },
-                // More dummy thumbnails (if needed, replace with your own)
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Cooking+Thumb", title: "Cooking Channel Thumbnail", category: "YouTube, Food", likes: "700", views: "3.2K", description: "Appetizing thumbnail for cooking channels, focusing on delicious food imagery and inviting typography." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Fitness+Thumb", title: "Fitness Guide Thumbnail", category: "YouTube, Health", likes: "1.3K", views: "6.5K", description: "Dynamic thumbnail for fitness guides, conveying energy and motivation with strong visuals and action-oriented design." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Finance+Thumb", title: "Finance Tips Thumbnail", category: "YouTube, Finance", likes: "1.0K", views: "5.0K", description: "Professional and trustworthy thumbnail for finance tips, using clean lines and relevant icons to represent financial advice." }
-            ],
-            logos: [
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Brand+Logo+Design", title: "Tech Solutions Logo", category: "Branding, Tech", description: "A minimalist and futuristic logo designed for a tech startup, emphasizing innovation and digital precision." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Cafe+Logo+Art", title: "Urban Cafe Logo", category: "Branding, Food & Beverage", description: "A warm and inviting logo for a modern urban cafe, blending classic elements with contemporary typography." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Fashion+Brand+Logo", title: "Chic Apparel Logo", category: "Branding, Fashion", description: "An elegant and sophisticated logo for a high-end fashion brand, reflecting luxury and style." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Consulting+Firm+Logo", title: "Strategic Consulting Logo", category: "Branding, Business", description: "A strong and trustworthy logo for a business consulting firm, conveying professionalism and strategic insight." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Gaming+Studio+Emblem", title: "Gaming Studio Logo", category: "Branding, Gaming", description: "An edgy and dynamic logo for a gaming studio, designed to appeal to a young, tech-savvy audience." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Real+Estate+Badge", title: "Real Estate Agency Logo", category: "Branding, Real Estate", description: "A clean and reliable logo for a real estate agency, symbolizing trust and stability." }
-            ],
-            reels: [
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Product+Reel+Video", title: "Product Showcase Reel", category: "Instagram, Marketing", description: "A fast-paced and visually rich reel for showcasing new products, optimized for social media engagement." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Event+Promo+Reel", title: "Event Promotion Reel", category: "Facebook, Events", description: "An energetic reel designed to promote upcoming events, featuring dynamic transitions and compelling calls to action." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Tutorial+Reel+Clip", title: "Quick Design Tutorial Reel", category: "TikTok, Education", description: "A concise and engaging tutorial reel breaking down complex design concepts into easily digestible steps." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Behind+Scenes+Reel+Vlog", title: "Behind the Scenes Reel", category: "Instagram, Personal", description: "An authentic and candid reel offering a glimpse into the creative process and daily life of a designer." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Fashion+Reel+Showcase", title: "Fashion Brand Reel", category: "Instagram, Fashion", description: "A stylish and trend-setting reel for a fashion brand, highlighting new collections and runway looks." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Travel+Vlog+Short", title: "Travel Vlog Reel", category: "TikTok, Travel", description: "An inspiring and adventurous reel capturing the highlights of a travel vlog, perfect for short-form video platforms." }
-            ],
-            uiux: [
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Website+UI+Design", title: "Modern Website UI", category: "UI/UX, Web", description: "Clean and intuitive user interface for a modern business website, focusing on user-centric design principles." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Mobile+App+UX", title: "Mobile App UX Flow", category: "UI/UX, Mobile", description: "Seamless user experience flow designed for a productivity mobile application, ensuring ease of use." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Dashboard+UI+Concept", title: "Analytics Dashboard UI", category: "UI/UX, Data", description: "Interactive dashboard interface for data visualization and management, designed for clarity and efficiency." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Landing+Page+UI+Kit", title: "Creative Landing Page UI", category: "UI/UX, Web", description: "Visually appealing landing page design focused on conversion, with compelling calls to action." }
-            ],
-            banners: [
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=E-commerce+Banner+Ad", title: "E-commerce Product Banner", category: "Banners, Marketing", description: "Eye-catching banner for online product promotions, designed to drive sales and brand recognition." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Event+Marketing+Banner", title: "Conference Event Banner", category: "Banners, Events", description: "Professional banner design for a virtual tech conference, ensuring high visibility and engagement." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Social+Media+Promo+Banner", title: "Social Media Ad Banner", category: "Banners, Social Media", description: "Engaging banner ad optimized for various social media platforms, crafted for maximum reach." }
-            ],
-            socialMediaKits: [
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Instagram+Template+Kit", title: "Instagram Brand Kit", category: "Social Media, Branding", description: "Complete set of templates and assets for a consistent Instagram presence, boosting brand identity." },
-                { src: "https://placehold.co/400x250/0d0d1a/ffffff?text=Facebook+Graphics+Kit", title: "Facebook Page Kit", category: "Social Media, Marketing", description: "Cohesive design elements for a professional Facebook business page, enhancing user interaction." }
-            ]
-        };
-
-        const itemsPerLoad = 4; // Number of items to show initially and on each "Load More" click
-
-        // Hero Section Slideshow Logic
-        const heroImages = [
-            "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Drive_Beyond_The_Horizon_p6icoz.jpg",
-            "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320301/Mobile_Style_Gaming_Thumbnail_lqgt12.jpg",
-            "https://res.cloudinary.com/dm4q9blay/image/upload/v1752305625/Mot_df9yxd.jpg",
-            "https://res.cloudinary.com/dm4q9blay/image/upload/v1752305625/My_squad_hxjaxt.jpg",
-            "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320298/Tung_Tung_Tung_Sahur_r4iuss.jpg",
-            "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320299/Discipline_Mind_n37wd7.jpg",
-            "https://res.cloudinary.com/dm4q9blay/image/upload/v1752320298/250_Confirm_Airdrop_towco9.jpg"
-        ];
-        let currentImageIndex = 0;
-        const heroSlideshowImage = document.getElementById('hero-slideshow-image');
-
-        function changeHeroImage() {
-            heroSlideshowImage.style.opacity = 0; // Fade out
-            setTimeout(() => {
-                currentImageIndex = (currentImageIndex + 1) % heroImages.length;
-                heroSlideshowImage.src = heroImages[currentImageIndex];
-                // Update alt text based on the image URL or a predefined array if available
-                // For simplicity, using a generic alt for now or you can map it to portfolioItems data
-                heroSlideshowImage.alt = "Graphic Design Thumbnail"; 
-                heroSlideshowImage.style.opacity = 1; // Fade in
-            }, 1000); // Wait for fade out to complete (1s transition)
-        }
-
-        // Change image every 5 seconds
-        setInterval(changeHeroImage, 5000);
-
-        // --- Modal Logic for Hire Me button ---
-        const hireMeButton = document.getElementById('hireMeButton');
-        const letsWorkButton = document.getElementById('letsWorkButton');
-        const letsCollaborateButton = document.getElementById('letsCollaborateButton');
-        const hireMeModal = document.getElementById('hireMeModal');
-        const hireMeForm = document.getElementById('hireMeForm');
-        const formMessage = document.getElementById('formMessage');
-        const messageTextArea = document.getElementById('message'); // Get the message textarea
-        const enhanceMessageButton = document.getElementById('enhanceMessageButton');
-        const enhanceMessageText = document.getElementById('enhanceMessageText');
-        const enhanceMessageSpinner = document.getElementById('enhanceMessageSpinner');
-
-        // Support Modal elements
-        const supportModal = document.getElementById('supportModal');
-        const supportForm = document.getElementById('supportForm');
-        const supportFormMessage = document.getElementById('supportFormMessage');
-
-        // Client Reviews Modal elements
-        const clientReviewsModal = document.getElementById('clientReviewsModal');
-
-        // Success Stories Modal elements
-        const successStoriesModal = document.getElementById('successStoriesModal');
-
-        // Portfolio Detail Modal elements
-        const portfolioDetailModal = document.getElementById('portfolioDetailModal');
-        const modalPortfolioImage = document.getElementById('modalPortfolioImage');
-        const modalPortfolioTitle = document.getElementById('modalPortfolioTitle');
-        const modalPortfolioCategory = document.getElementById('modalPortfolioCategory');
-        const modalPortfolioDescription = document.getElementById('modalPortfolioDescription');
-        const modalPortfolioStats = document.getElementById('modalPortfolioStats'); // Container for likes/views
-        const modalPortfolioLikes = document.getElementById('modalPortfolioLikes');
-        const modalPortfolioViews = document.getElementById('modalPortfolioViews');
-        const relatedItemsSection = document.getElementById('relatedItemsSection'); // Section for "More from this Niche"
-        const relatedPortfolioItemsContainer = document.getElementById('relatedPortfolioItems');
-
-        // Service Showcase Modal elements
-        const serviceShowcaseModal = document.getElementById('serviceShowcaseModal');
-        const serviceShowcaseTitle = document.getElementById('serviceShowcaseTitle');
-        const serviceShowcaseGrid = document.getElementById('serviceShowcaseGrid');
-        const serviceShowcaseLoadMoreBtn = document.getElementById('serviceShowcaseLoadMoreBtn');
-        let currentServiceType = ''; // To keep track of which service is open in the modal
-        let currentServiceItemsLoaded = 0; // To keep track of how many items are loaded in service modal
-
-
-        // Function to open any modal
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent body scrolling
-        }
-
-        // Function to close any modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-            document.body.style.overflow = ''; // Restore body scrolling
-            // Reset specific form/message if closing hireMeModal
-            if (modalId === 'hireMeModal') {
-                hireMeForm.reset();
-                formMessage.classList.add('hidden');
-                formMessage.classList.remove('text-red-400', 'text-yellow-400');
-                formMessage.classList.add('text-green-400');
-            }
-            // Reset specific form/message if closing supportModal
-            if (modalId === 'supportModal') {
-                supportForm.reset();
-                supportFormMessage.classList.add('hidden');
-                supportFormMessage.classList.remove('text-red-400', 'text-yellow-400');
-                supportFormMessage.classList.add('text-green-400');
-            }
-            // Clear related items when closing portfolio modal
-            if (modalId === 'portfolioDetailModal') {
-                relatedPortfolioItemsContainer.innerHTML = '';
-            }
-            // Reset service showcase modal state
-            if (modalId === 'serviceShowcaseModal') {
-                serviceShowcaseGrid.innerHTML = '';
-                serviceShowcaseLoadMoreBtn.classList.add('hidden');
-                currentServiceItemsLoaded = 0;
-                currentServiceType = '';
-            }
-        }
-
-        // Event listeners for buttons to open hireMeModal
-        hireMeButton.addEventListener('click', () => openModal('hireMeModal'));
-        letsWorkButton.addEventListener('click', () => openModal('hireMeModal'));
-        letsCollaborateButton.addEventListener('click', () => openModal('hireMeModal'));
-
-        // Close modals when clicking outside the content
-        window.addEventListener('click', (event) => {
-            if (event.target == hireMeModal) {
-                closeModal('hireMeModal');
-            }
-            if (event.target == portfolioDetailModal) {
-                closeModal('portfolioDetailModal');
-            }
-            if (event.target == supportModal) {
-                closeModal('supportModal');
-            }
-            if (event.target == clientReviewsModal) {
-                closeModal('clientReviewsModal');
-            }
-            if (event.target == successStoriesModal) {
-                closeModal('successStoriesModal');
-            }
-            if (event.target == serviceShowcaseModal) {
-                closeModal('serviceShowcaseModal');
-            }
-        });
-
-        // Handle form submission using Fetch API for better feedback
-        hireMeForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // ALWAYS prevent default submission for AJAX
-
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const message = document.getElementById('message').value;
-
-            if (!name || !email || !message) {
-                formMessage.textContent = 'Please fill in all fields before sending.';
-                formMessage.classList.remove('hidden', 'text-green-400', 'text-yellow-400');
-                formMessage.classList.add('text-red-400');
-                return;
-            }
-
-            formMessage.textContent = 'Sending your message...';
-            formMessage.classList.remove('hidden', 'text-red-400', 'text-green-400');
-            formMessage.classList.add('text-yellow-400');
-
-            try {
-                const response = await fetch(hireMeForm.action, {
-                    method: 'POST',
-                    body: new FormData(hireMeForm), // Automatically creates form data
-                    headers: {
-                        'Accept': 'application/json' // Important for Formspree AJAX response
-                    }
-                });
-
-                if (response.ok) {
-                    formMessage.textContent = 'Thank you for your message! I\'ll get back to you soon.';
-                    formMessage.classList.remove('text-red-400', 'text-yellow-400');
-                    formMessage.classList.add('text-green-400');
-                    setTimeout(() => {
-                        closeModal('hireMeModal');
-                    }, 3000); // Close modal after 3 seconds on success
-                } else {
-                    // Handle non-2xx responses from Formspree
-                    const errorData = await response.json();
-                    formMessage.textContent = `Error: ${errorData.errors ? errorData.errors.map(e => e.message).join(', ') : 'Something went wrong.'}`;
-                    formMessage.classList.remove('text-green-400', 'text-yellow-400');
-                    formMessage.classList.add('text-red-400');
-                    console.error('Formspree submission error:', errorData);
-                }
-            } catch (error) {
-                formMessage.textContent = 'Network error. Please check your internet connection.';
-                formMessage.classList.remove('text-green-400', 'text-yellow-400');
-                formMessage.classList.add('text-red-400');
-                console.error('Fetch error:', error);
-            }
-        });
-
-        // Handle Support form submission
-        supportForm.addEventListener('submit', async (event) => {
-            event.preventDefault(); // ALWAYS prevent default submission for AJAX
-
-            const name = document.getElementById('supportName').value;
-            const email = document.getElementById('supportEmail').value;
-            const subject = document.getElementById('supportSubject').value;
-            const message = document.getElementById('supportMessage').value;
-
-            if (!name || !email || !subject || !message) {
-                supportFormMessage.textContent = 'Please fill in all fields before sending.';
-                supportFormMessage.classList.remove('hidden', 'text-green-400', 'text-yellow-400');
-                supportFormMessage.classList.add('text-red-400');
-                return;
-            }
-
-            supportFormMessage.textContent = 'Sending your support request...';
-            supportFormMessage.classList.remove('hidden', 'text-red-400', 'text-green-400');
-            supportFormMessage.classList.add('text-yellow-400');
-
-            try {
-                const response = await fetch(supportForm.action, {
-                    method: 'POST',
-                    body: new FormData(supportForm),
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    supportFormMessage.textContent = 'Your support request has been sent! I\'ll get back to you soon.';
-                    supportFormMessage.classList.remove('text-red-400', 'text-yellow-400');
-                    supportFormMessage.classList.add('text-green-400');
-                    setTimeout(() => {
-                        closeModal('supportModal');
-                    }, 3000);
-                } else {
-                    const errorData = await response.json();
-                    supportFormMessage.textContent = `Error: ${errorData.errors ? errorData.errors.map(e => e.message).join(', ') : 'Something went wrong.'}`;
-                    supportFormMessage.classList.remove('text-green-400', 'text-yellow-400');
-                    supportFormMessage.classList.add('text-red-400');
-                    console.error('Formspree support submission error:', errorData);
-                }
-            } catch (error) {
-                supportFormMessage.textContent = 'Network error. Please check your internet connection.';
-                supportFormMessage.classList.remove('text-green-400', 'text-yellow-400');
-                supportFormMessage.classList.add('text-red-400');
-                console.error('Fetch error for support form:', error);
-            }
-        });
-
-
-        // --- Gemini API Integration: Enhance Message Feature ---
-        enhanceMessageButton.addEventListener('click', async () => {
-            const currentMessage = messageTextArea.value.trim();
-
-            if (!currentMessage) {
-                formMessage.textContent = 'Please type a message first to enhance.';
-                formMessage.classList.remove('hidden', 'text-green-400');
-                formMessage.classList.add('text-red-400');
-                return;
-            }
-
-            // Show loading indicator
-            enhanceMessageText.textContent = 'Enhancing...';
-            enhanceMessageSpinner.classList.remove('hidden');
-            enhanceMessageButton.disabled = true; // Disable button during API call
-            formMessage.classList.add('hidden'); // Hide previous messages
-
-            try {
-                let chatHistory = [];
-                const prompt = `You are an AI assistant helping a client write a clear and concise message to a graphic designer. Enhance the following project request, making it more professional, detailed, and clear, without adding information not implied by the original text. Focus on clarity, scope, and desired outcome. Keep it concise, aiming for a paragraph or two.
-
-Original message: "${currentMessage}"
-
-Enhanced message:`;
-
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                const payload = { contents: chatHistory };
-                const apiKey = ""; // If you want to use models other than gemini-2.0-flash or imagen-3.0-generate-002, provide an API key here. Otherwise, leave this as-is.
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const enhancedText = result.candidates[0].content.parts[0].text;
-                    messageTextArea.value = enhancedText; // Update the textarea with the enhanced message
-                    formMessage.textContent = 'Message enhanced successfully!';
-                    formMessage.classList.remove('hidden', 'text-red-400');
-                    formMessage.classList.add('text-green-400');
-                } else {
-                    formMessage.textContent = 'Could not enhance message. Please try again.';
-                    formMessage.classList.remove('hidden', 'text-green-400');
-                    formMessage.classList.add('text-red-4400');
-                    console.error('Gemini API response structure unexpected:', result);
-                }
-
-            } catch (error) {
-                formMessage.textContent = 'Error enhancing message. Please try again later.';
-                formMessage.classList.remove('hidden', 'text-green-400');
-                formMessage.classList.add('text-red-400');
-                console.error('Error calling Gemini API:', error);
-            } finally {
-                // Hide loading indicator and re-enable button
-                enhanceMessageText.textContent = '✨ Enhance Message';
-                enhanceMessageSpinner.classList.add('hidden');
-                enhanceMessageButton.disabled = false;
-            }
-        });
-
-
-        // --- Smooth scrolling for navigation links and modal triggers ---
-        document.querySelectorAll('nav a[href^="#"], footer a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                const targetId = this.getAttribute('href');
-                const modalTarget = this.dataset.modalTarget; // Get data-modal-target attribute
-
-                if (modalTarget) {
-                    e.preventDefault(); // Prevent default behavior for modal triggers
-                    openModal(modalTarget); // Open the specified modal
-                    return; // Exit the function
-                }
-                
-                // Handle regular smooth scrolling for section IDs
-                if (targetId === '#' || targetId.trim() === '') {
-                    e.preventDefault(); // Prevent default behavior (e.g., jumping to top)
-                    return; // Exit the function, do not try to scroll
-                }
-
-                const targetElement = document.querySelector(targetId);
-
-                if (targetElement) {
-                    e.preventDefault(); // Prevent default only if a valid target is found
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
             });
-        });
-
-        // --- Portfolio Item Rendering and "Load More" Functionality ---
-
-        // Function to create a portfolio card HTML
-        function createPortfolioCard(item, type) {
-            const card = document.createElement('div');
-            card.className = 'bg-gray-800 rounded-3xl shadow-lg overflow-hidden card-glow cursor-pointer portfolio-item';
-            card.dataset.type = type; // Store type for filtering
-            card.dataset.index = portfolioItems[type].indexOf(item); // Store index for retrieval
-
-            let statsHtml = '';
-            // Only show likes/views if they exist and are not for service showcase items
-            if (item.likes && item.views && ['thumbnails', 'reels'].includes(type)) { // Only thumbnails and reels have likes/views in this dummy data
-                statsHtml = `
-                    <div class="flex justify-between items-center text-gray-400 text-sm mt-4">
-                        <span><i class="fas fa-heart text-red-500 mr-1"></i> ${item.likes} Likes</span>
-                        <span><i class="fas fa-eye text-blue-500 mr-1"></i> ${item.views} Views</span>
-                    </div>
-                `;
-            }
-
-            card.innerHTML = `
-                <img src="${item.src}" alt="${item.title}" class="w-full h-48 object-cover rounded-t-3xl ${type === 'logos' || type === 'uiux' || type === 'banners' || type === 'socialMediaKits' ? 'p-4' : ''}">
-                <div class="p-5">
-                    <h4 class="text-xl font-semibold text-white">${item.title}</h4>
-                    <p class="text-gray-400 text-sm mb-2">Category: ${item.category}</p>
-                    ${statsHtml}
-                </div>
-            `;
-            card.addEventListener('click', () => openPortfolioDetailModal(item, type));
-            return card;
-        }
-
-        // Function to render initial portfolio items
-        function renderPortfolioItems(type) {
-            const container = document.getElementById(`${type}-grid`);
-            container.innerHTML = ''; // Clear existing items
-
-            portfolioItems[type].slice(0, itemsPerLoad).forEach(item => {
-                container.appendChild(createPortfolioCard(item, type));
-            });
-            // Update load more button visibility
-            const loadMoreButton = document.querySelector(`#${type}-section .load-more-btn`);
-            if (portfolioItems[type].length <= itemsPerLoad) {
-                loadMoreButton.style.display = 'none';
-            } else {
-                loadMoreButton.style.display = 'block';
-            }
-        }
-
-        // Function to handle "Load More" button clicks for main portfolio sections
-        document.querySelectorAll('.load-more-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const targetSectionId = this.dataset.target;
-                const type = targetSectionId.replace('-section', ''); // e.g., 'thumbnails'
-                const container = document.getElementById(`${type}-grid`);
-
-                const currentItemsCount = container.children.length;
-                const remainingItems = portfolioItems[type].slice(currentItemsCount);
-
-                remainingItems.slice(0, itemsPerLoad).forEach(item => {
-                    container.appendChild(createPortfolioCard(item, type));
-                });
-
-                // If no more hidden items, hide the button
-                if (container.children.length >= portfolioItems[type].length) {
-                    this.style.display = 'none';
-                }
-            });
-        });
-
-        // --- Popular Designs Click Handler ---
-        document.querySelectorAll('.popular-design-item').forEach(itemCard => {
-            itemCard.addEventListener('click', function() {
-                const itemData = {
-                    src: this.dataset.src,
-                    title: this.dataset.title,
-                    category: this.dataset.category,
-                    likes: this.dataset.likes,
-                    views: this.dataset.views,
-                    description: this.dataset.description
-                };
-                // Pass a flag to indicate it's a popular design, so related items are hidden
-                openPortfolioDetailModal(itemData, null, true); // type is null as no niche filtering here, isPopularDesign is true
-            });
-        });
-
-        // --- Portfolio Detail Modal Logic ---
-        function openPortfolioDetailModal(item, type, isPopularDesign = false) {
-            modalPortfolioImage.src = item.src;
-            modalPortfolioImage.alt = item.title;
-            modalPortfolioTitle.textContent = item.title;
-            modalPortfolioCategory.textContent = `Category: ${item.category}`;
-            modalPortfolioDescription.textContent = item.description || "No detailed description available for this item.";
-
-            if (item.likes && item.views) {
-                modalPortfolioStats.style.display = 'flex'; // Show stats container
-                modalPortfolioLikes.innerHTML = `<i class="fas fa-heart text-red-500 mr-1"></i> ${item.likes} Likes`;
-                modalPortfolioViews.innerHTML = `<i class="fas fa-eye text-blue-500 mr-1"></i> ${item.views} Views`;
-            } else {
-                modalPortfolioStats.style.display = 'none'; // Hide stats container if no likes/views
-            }
-
-            // Handle "More from this Niche" section based on isPopularDesign flag and type
-            if (isPopularDesign || !type) { // If popular design or type not provided, hide related section
-                relatedItemsSection.style.display = 'none';
-            } else {
-                relatedItemsSection.style.display = 'block';
-                relatedPortfolioItemsContainer.innerHTML = ''; // Clear previous related items
-                const relatedItems = portfolioItems[type].filter(relatedItem => relatedItem !== item); // Exclude the current item
-                
-                // Shuffle related items and take a few
-                const shuffledRelated = relatedItems.sort(() => 0.5 - Math.random());
-                shuffledRelated.slice(0, 4).forEach(related => { // Show up to 4 related items
-                    const relatedCard = document.createElement('div');
-                    relatedCard.className = 'bg-gray-700 rounded-xl shadow-md overflow-hidden cursor-pointer';
-                    relatedCard.innerHTML = `
-                        <img src="${related.src}" alt="${related.title}" class="w-full h-24 object-cover rounded-t-xl">
-                        <div class="p-2 text-center">
-                            <p class="text-sm font-semibold text-white truncate">${related.title}</p>
-                        </div>
-                    `;
-                    relatedCard.addEventListener('click', () => {
-                        // When a related item is clicked, update the modal with its details
-                        openPortfolioDetailModal(related, type); // Keep the type for subsequent related items
-                    });
-                    relatedPortfolioItemsContainer.appendChild(relatedCard);
-                });
-            }
-
-            openModal('portfolioDetailModal');
-        }
-
-        // --- Explore Services Click Handler ---
-        document.querySelectorAll('.service-item').forEach(serviceCard => {
-            serviceCard.addEventListener('click', function() {
-                const serviceType = this.dataset.serviceType; // e.g., 'thumbnails', 'logos', 'uiux'
-                const serviceTitle = this.querySelector('h3').textContent; // Get the title from the card
-
-                serviceShowcaseTitle.textContent = `${serviceTitle} Designs`;
-                currentServiceType = serviceType; // Set current service type
-                currentServiceItemsLoaded = 0; // Reset loaded count for new service
-
-                // Initial load for the service showcase modal
-                loadServiceShowcaseItems();
-                openModal('serviceShowcaseModal');
-            });
-        });
-
-        // Function to load items into the service showcase modal
-        function loadServiceShowcaseItems() {
-            const items = portfolioItems[currentServiceType];
-            if (!items) return;
-
-            const startIndex = currentServiceItemsLoaded;
-            const endIndex = startIndex + itemsPerLoad;
-            const itemsToRender = items.slice(startIndex, endIndex);
-
-            // Clear previous items only if it's the first load for this service type
-            if (currentServiceItemsLoaded === 0) {
-                serviceShowcaseGrid.innerHTML = ''; 
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
             }
             
-            // Append items to the grid
-            itemsToRender.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'bg-gray-800 rounded-3xl shadow-lg overflow-hidden card-glow cursor-pointer';
-                card.innerHTML = `
-                    <img src="${item.src}" alt="${item.title}" class="w-full h-48 object-cover rounded-t-3xl ${currentServiceType === 'logos' || currentServiceType === 'uiux' || currentServiceType === 'banners' || currentServiceType === 'socialMediaKits' ? 'p-4' : ''}">
-                    <div class="p-5">
-                        <h4 class="text-xl font-semibold text-white">${item.title}</h4>
-                        <p class="text-gray-400 text-sm mb-2">Category: ${item.category}</p>
-                    </div>
-                `;
-                // When an item in service showcase is clicked, open the main portfolio detail modal
-                card.addEventListener('click', () => {
-                    closeModal('serviceShowcaseModal'); // Close service modal first
-                    openPortfolioDetailModal(item, currentServiceType); // Open detail modal
-                });
-                serviceShowcaseGrid.appendChild(card);
-            });
-
-            currentServiceItemsLoaded += itemsToRender.length;
-
-            // Show/hide load more button for service showcase modal
-            if (currentServiceItemsLoaded < items.length) {
-                serviceShowcaseLoadMoreBtn.classList.remove('hidden');
-            } else {
-                serviceShowcaseLoadMoreBtn.classList.add('hidden');
-            }
+            // Scroll to top
+            window.scrollTo(0, 0);
         }
 
-        // Event listener for "Load More" button inside service showcase modal
-        serviceShowcaseLoadMoreBtn.addEventListener('click', loadServiceShowcaseItems);
+        // Image processing simulation
+        function processImage(tool) {
+            // Create processing modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Processing your image...</h3>
+                        <div class="w-64 bg-gray-200 rounded-full h-2 mx-auto mb-4">
+                            <div id="modalProgressBar" class="gradient-bg h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p class="text-gray-600">This may take a few moments</p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Simulate processing
+            let progress = 0;
+            const progressBar = modal.querySelector('#modalProgressBar');
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        // Show success
+                        modal.innerHTML = `
+                            <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                                <div class="text-center">
+                                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Image processed successfully!</h3>
+                                    <div class="flex justify-center space-x-4 mt-6">
+                                        <button onclick="alert('Download would start here')" class="gradient-bg text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                                            Download Image
+                                        </button>
+                                        <button onclick="document.body.removeChild(this.closest('.fixed'))" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }, 500);
+                }
+                progressBar.style.width = progress + '%';
+            }, 200);
+        }
 
+        // File upload handling for all upload areas
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadAreas = document.querySelectorAll('.upload-area');
+            
+            uploadAreas.forEach(area => {
+                area.addEventListener('click', () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e) => {
+                        if (e.target.files.length > 0) {
+                            alert('Image selected: ' + e.target.files[0].name + '\nNow you can adjust settings and process the image.');
+                        }
+                    };
+                    input.click();
+                });
 
-        // Initial rendering of main portfolio items on page load
-        window.addEventListener('load', () => {
-            renderPortfolioItems('thumbnails');
-            renderPortfolioItems('logos');
-            renderPortfolioItems('reels');
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+
+                area.addEventListener('dragleave', () => {
+                    area.classList.remove('dragover');
+                });
+
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        alert('Image dropped: ' + files[0].name + '\nNow you can adjust settings and process the image.');
+                    }
+                });
+            });
         });
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97575021220be285',t:'MTc1NjI1MzA4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
